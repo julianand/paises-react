@@ -9,7 +9,7 @@ class CardPais extends React.Component {
                     <h5 className="card-title">{this.props.res.name}</h5>
                     <h6 className="card-subtitle mb-2 text-muted">Capital: {this.props.res.capital}</h6>
                     <p className="card-text">{this.props.res.altSpellings.join(' ')}</p>
-                    <Link to={'/' + this.props.res.alpha2Code}>Mas información</Link>
+                    <Link to={'/' + this.props.res.alpha3Code}>Mas información</Link>
                 </div>
             </div>
 		);

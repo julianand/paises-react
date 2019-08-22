@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 
 import axios from 'axios/dist/axios.js';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import BarraBuscar from './components/BarraBuscar';
 import CardPais from './components/CardPais';
@@ -13,33 +13,31 @@ class Index extends React.Component {
         super(props);
         this.state = {
             paises: [],
-            resultadosBusqueda: []
+            filtro: { input: '' }
         };
     }
 
     componentDidMount () {
         axios.get('https://restcountries.eu/rest/v2/all').then(res => {
             this.setState({
-                paises: res.data,
-                resultadosBusqueda: res.data
+                paises: res.data
             });
         });
     }
 
-    handleBarraBuscar ({ input }) {
-        if (input) {
-            var paises = [...this.state.paises];
-            var resultadosBusqueda = paises.filter(pais => pais.name.toLowerCase().indexOf(input.toLowerCase()) != -1);
-
-            this.setState({
-                resultadosBusqueda: resultadosBusqueda
-            });
-        }
+    handleBarraBuscar (filtro) {
+        this.setState({
+            filtro: {...filtro}
+        });
     }
 
     render() {
-        var resultadosBusqueda = [...this.state.resultadosBusqueda];
-
+        var paises = [...this.state.paises];
+        var { input } = this.state.filtro;
+        var resultadosBusqueda = paises.filter(
+            pais => pais.name.toLowerCase().indexOf(input.toLowerCase()) !== -1
+        );
+        
         return (
             <div className="m-5">
                 <div className="alert alert-info">
@@ -50,12 +48,12 @@ class Index extends React.Component {
                 <div className="row">
                     { resultadosBusqueda.length > 0 ? (
                         resultadosBusqueda.map(res => (
-                            <div className="col-4" key={res.alpha2Code}>
+                            <div className="col-4" key={res.alpha3Code}>
                                 <CardPais res={res}/>
                             </div>
                         )) 
                     ) : (
-                        <div className="col-12">Digite un pais...</div>
+                        <div className="col-12">No se encuentra este país :(</div>
                     )}
                 </div>
             </div>
@@ -63,10 +61,56 @@ class Index extends React.Component {
     }
 }
 
+async function findPais (alpha3Code) {
+    var response = await axios.get('https://restcountries.eu/rest/v2/alpha/' + alpha3Code);
+    return response.data;
+}
+
 class Pais extends React.Component {
+    constructor (props) {
+        super(props);
+        this.state = { pais: null };
+    }
+
     render () {
+        var pais = this.state.pais;
+        var { alpha3Code } = this.props.match.params;
+        
+        if (!pais || pais.alpha3Code !== alpha3Code) findPais(alpha3Code).then(res => this.setState({ pais: res }));
+
         return (
-            'xd'
+            <div className="m-5">
+                {pais ? (
+                    <div className="row">
+                        <div className="col-9">
+                            <h1>{pais.name}</h1>
+                            <br/>
+                            <p>Capital: {pais.capital}.</p>
+                            <p>Region: {pais.region}.</p>
+                            <p>Subregion: {pais.subregion}.</p>
+                            <p>Poblacion: {pais.population} personas.</p>
+                            <p>Latitud: {pais.latlng[0]}.</p>
+                            <p>Longitud: {pais.latlng[1]}.</p>
+                            Zonas horarias:
+                            <ul>
+                                {pais.timezones.map(timezone => <li key={timezone}>{timezone}</li>)}
+                            </ul>
+                            Codigos de llamada:
+                            <ul>
+                                {pais.callingCodes.map(code => <li key={code}>{code}</li>)}
+                            </ul>
+                            Bordes:
+                            <ul>
+                                {pais.borders.map(
+                                    border => <li key={border}><Link to={'/' + border}>{border}</Link></li>
+                                )}
+                            </ul>
+                        </div>
+                    </div>
+                ) : (
+                    <div>NOT FOUND</div>
+                )}  
+            </div>   
         );
     }
 }
@@ -76,7 +120,7 @@ class App extends React.Component {
         return (
             <Router>
                 <Route path="/" exact component={Index}></Route>
-                <Route path="/:alpha2Code" component={Pais}></Route>
+                <Route path="/:alpha3Code" component={Pais}></Route>
             </Router>
         );
     }

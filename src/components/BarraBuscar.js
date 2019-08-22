@@ -3,19 +3,14 @@ import React from 'react';
 class BarraBuscar extends React.Component {
 	constructor (props) {
 		super(props);
-		this.state = { filtro: {} };
+		this.filtro = {};
 	}
 
 	handleChange (event) {
 		var target = event.target;
-
-		this.setState({
-			filtro: {
-				[target.name]: target.value
-			}
-		});
-
-		this.props.handleChanges(this.state.filtro);
+		this.filtro = { ...this.filtro, [target.name]: target.value };
+		
+		this.props.handleChanges(this.filtro);
 	}
 
 	render () {
