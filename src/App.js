@@ -80,9 +80,10 @@ class Pais extends React.Component {
 
         return (
             <div className="m-5">
+                <Link to="/">Atras</Link>
                 {pais ? (
                     <div className="row">
-                        <div className="col-9">
+                        <div className="col-6">
                             <h1>{pais.name}</h1>
                             <br/>
                             <p>Capital: {pais.capital}.</p>
@@ -105,6 +106,12 @@ class Pais extends React.Component {
                                     border => <li key={border}><Link to={'/' + border}>{border}</Link></li>
                                 )}
                             </ul>
+                        </div>
+                        <div className="col-6">
+                            <figure className="figure">
+                                <img className="img-fluid" src={pais.flag} alt={pais.name}/>
+                                <figcaption className="figure-caption">Bandera de {pais.name}</figcaption>
+                            </figure>
                         </div>
                     </div>
                 ) : (
