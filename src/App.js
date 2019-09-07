@@ -92,6 +92,10 @@ class Pais extends React.Component {
                             <p>Poblacion: {pais.population} personas.</p>
                             <p>Latitud: {pais.latlng[0]}.</p>
                             <p>Longitud: {pais.latlng[1]}.</p>
+                            Lenguajes:
+                            <ul>
+                                {pais.languages.map(lng => <li key={lng.iso639_1}>{lng.name + ' ' + lng.nativeName}</li>)}
+                            </ul>
                             Zonas horarias:
                             <ul>
                                 {pais.timezones.map(timezone => <li key={timezone}>{timezone}</li>)}
